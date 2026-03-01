@@ -1,0 +1,139 @@
+{
+  "name": "weather-forecast-bot",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "line-webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "id": "8fd4d5b8-3f99-4767-9a24-efe1cae4177c",
+      "name": "LINE受信用",
+      "webhookId": "5ac21c78-e6a7-482b-b33d-03c9738e8afb"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "79ab7f1a-3e42-450b-a0be-dc7dc3dd51dd",
+              "name": "body.events[0].message.text",
+              "value": "={{ $json.body.events[0].message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [208, 0],
+      "id": "7e1b9ef3-dd87-4652-96ad-1a3ccb5036c7",
+      "name": "メッセージのみ取得"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=（１）ユーザーからもらったテキストから、年月日、時刻、都市名を正確に抜き取って、Weatherにて天気を調べ、教えてください。 {{ $json.body.events[0].message.text }}\n\n※回答は一文で返し、改行しないでください",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [416, 0],
+      "id": "1f833630-0f74-4df7-b3dc-530e9989541f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [416, 160],
+      "id": "31590d2d-e2f0-49d9-8de8-bda82aefb7aa",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "",
+          "name": "YOUR_OPENAI_API_KEY"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/reply",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization ",
+              "value": "Bearer YOUR_LINE_ACCESS_TOKEN"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"replyToken\": \"{{ $('LINE受信用').item.json.body.events[0].replyToken }}\",\n  \"messages\": [\n    {\n      \"type\": \"text\",\n      \"text\": \"{{$json['output']}}\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [768, 0],
+      "id": "e46320b7-48d2-4c24-a72d-96b5f26c14c7",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "cityName": "={{ $fromAI('City', ``, 'string') }}",
+        "language": "={{ $fromAI('Language', ``, 'string') }}",
+      },
+      "type": "n8n-nodes-base.openWeatherMapTool",
+      "typeVersion": 1,
+      "position": [560, 160],
+      "id": "e53eaed1-6147-4e00-aeeb-c2eef45a6668",
+      "name": "Weather",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "",
+          "name": "YOUR_OPENWEATHERMAP_KEY"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "LINE受信用": { "main": [[{"node": "メッセージのみ取得","type": "main","index": 0}]] },
+    "メッセージのみ取得": { "main": [[{"node": "AI Agent","type": "main","index": 0}]] },
+    "OpenAI Chat Model": { "ai_languageModel": [[{"node": "AI Agent","type": "ai_languageModel","index": 0}]] },
+    "AI Agent": { "main": [[{"node": "HTTP Request","type": "main","index": 0}]] },
+    "Weather": { "ai_tool": [[{"node": "AI Agent","type": "ai_tool","index": 0}]] }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "736bbbc5-e43f-4b7a-8d78-4a7e17b19a6c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a6798d706381694fa3543195c092ff53225829222f549185df2506907ade7545"
+  },
+  "id": "Zbw4bW4ZOCqWFk99zhN09",
+  "tags": []
+}
