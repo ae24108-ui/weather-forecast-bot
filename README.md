@@ -1,4 +1,4 @@
-# Weather Forecast Bot
+# weather-forecast-bot
 > n8nで作成
 
 ## 🚩概要
@@ -23,7 +23,7 @@
 
 ```bash
 git clone https://github.com/ae24108-ui/weather-forecast-bot.git
-cd weather-foecast-bot
+cd weather-forecast-bot
 ```
 
 ---
@@ -42,10 +42,12 @@ cp .env.example .env
 
 - '.env'に各自のAPIキーやトークンを設定
 
+```env
 OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxx
 OPENWEATHERMAP_API_KEY=yyyyyyyyyyyyyyyy
 LINE_CHANNEL_ACCESS_TOKEN=zzzzzzzzzzzz
 N8N_ENCRYPTION_KEY=32文字のランダム文字列
+```
 
 ---
 
@@ -61,7 +63,7 @@ n8n start
 
 - n8n UI で workflow-weather-forecast.json をインポート
 
-- ローカルで webhook を使う場合は Cloudflare トンネルなどで外部公開が必要
+- ローカルで webhook を使う場合は、Cloudflare トンネルや localtunnel などで外部公開が必要です
 
 - 公式クラウド版 n8n を使う場合は webhook URL は常時アクセス可能
 
