@@ -11,13 +11,13 @@
 
 ## 📃ファイル構成
 
-- 'weather-forecast-bot.json' :n8nでエクスポートしたワークフロー
+- 'weather-forecast-bot.json' : n8nでエクスポートしたワークフロー
 - '.env.example' :環境変数のテンプレート（APIキーやトークンは含まない）
 - 以下省略
 
 ---
 
-## 実行方法（クラウド版n8n用）
+## 🎳実行方法（クラウド版n8n用）
 
 1. リポジトリを clone
 
@@ -51,7 +51,7 @@ N8N_ENCRYPTION_KEY=32文字のランダム文字列
 
 ---
 
-3. n8nの起動
+3. n8n の起動
 
 ```bash
 n8n start
